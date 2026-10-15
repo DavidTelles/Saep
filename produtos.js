@@ -4,7 +4,7 @@ const db = require('./db');
 
 router.get('/', async (req, res) => {
     try {
-        const [produtos] = await db.query('SELECT * FROM produtos');
+        const { rows: produtos } = await db.query('SELECT * FROM produtos ORDER BY id');
         res.json(produtos);
     } catch (erro) {
         res.status(500).json({ erro: 'Erro ao buscar produtos' });
@@ -19,11 +19,11 @@ router.post('/', async (req, res) => {
     if (!categoria) return res.status(400).json({ erro: 'Categoria obrigatória' });
 
     try {
-        const sql = 'INSERT INTO produtos (nome, valor, quantidade, categoria) VALUES (?, ?, ?, ?)';
-        const [resultado] = await db.query(sql, [nome, valor, quantidade, categoria]);
+        const sql = 'INSERT INTO produtos (nome, valor, quantidade, categoria) VALUES ($1, $2, $3, $4) RETURNING id';
+        const { rows } = await db.query(sql, [nome, valor, quantidade, categoria]);
 
-        res.status(201).json({ 
-            id: resultado.insertId, 
+        res.status(201).json({
+            id: rows[0].id,
             nome, 
             valor, 
             quantidade, 
