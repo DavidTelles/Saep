@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const produtosRoutes = require('./produtos');
 
@@ -11,6 +12,10 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     if (req.method === 'OPTIONS') return res.sendStatus(204);
     next();
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.use('/produtos', produtosRoutes);
